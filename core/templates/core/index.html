@@ -43,7 +43,7 @@
         <div class ="center_section">
             {% for product in products %}
 
-            <div class="product_card">
+            <div id="produkt-{{ product.id }}" class="product_card">
                 <div class="product_minature">
                     <img src="{{ product.image.url }}" alt="{{ product.title }}">
                 </div>

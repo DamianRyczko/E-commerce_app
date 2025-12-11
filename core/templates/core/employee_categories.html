@@ -2,35 +2,40 @@
 {% load static %}
 
 {% block css %}
-
+    <link rel="stylesheet" href="{% static 'core/css/employee_category_style.css' %}">
 {% endblock %}
 
 {% block content %}
     <div class="main_container">
-    <h1>Koszyk</h1>
-    <div class ="cart_info_section">
-        <div class ="item_section">
+    <h1>Kategorie</h1>
+        <div class ="category_section">
             {% for category in categories %}
             <div class="category_card">
                 <div class="category_info">
                     <h2>{{ category.title }}</h2>
                     <h4>{{ category.description }}</h4>
 
-                    <div class="category_update_button">
-                        <a href="{% url 'edit_category' category.id %}">
-                            <div class="nav_button">Edutuj</div>
-                        </a>
-                        <a href="{% url 'edit_category' category.id%}">
-                            <div class="nav_button">Edutuj</div>
-                        </a>
-                    </div>
-
+                    <div class="button_box">
+                            <a href="{% url 'edit_category' category.id %}">
+                                <button class="function_button">Edutuj</button>
+                            </a>
+                            <form action="{% url 'delete_category' category.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="function_button">
+                                    Usuń
+                                </button>
+                            </form>
+                        </div>
                 </div>
             </div>
             {% empty %}
                 <p>No cats available right now :(</p>
             {% endfor %}
+        <a href="{% url 'add_category' %}">
+            <div class="add_card">
+                <h2>+</h2>
+            </div>
+        </a>
         </div>
-    </div>
     </div>
 {% endblock %}

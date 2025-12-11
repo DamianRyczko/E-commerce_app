@@ -22,10 +22,9 @@ class DjangoCartRepository(ICartRepository):
         cart_item.quantity += quantity
         cart_item.save()
 
-    def update_item_qty(self, user, product_id: int, quantity: int) -> None:
+    def update_item_qty(self, user, product, quantity: int) -> None:
         cart = self._get_cart(user)
-        product = get_object_or_404(Product, pk=product_id)
-        cart_item = CartItem.objects.filter(cart=cart, product=product).first()
+        cart_item = CartItem.objects.filter(cart=cart, product=product.id).first()
         if cart_item:
             if quantity <= 0:
                 cart_item.delete()
@@ -55,6 +54,13 @@ class DjangoProductRepository(IProductRepository):
     def delete_product(self, product):
         product.delete()
 
+    def category_has_products(self, category) -> bool:
+        return Product.objects.filter(category=category).exists()
+
+    def category_has_active_products(self, category) -> bool:
+        return Product.objects.filter(category=category, is_active=True ).exists()
+
+
 
 class DjangoCategoryRepository(ICategoryRepository):
     def get_all(self):
@@ -66,13 +72,16 @@ class DjangoCategoryRepository(ICategoryRepository):
     def save_category(self, category):
         category.save()
 
+    def delete_category(self, category):
+        category.delete()
+
 
 class DjangoAddressRepository(IAddressRepository):
     def get_user_addresses(self, user):
         customer, _ = Customer.objects.get_or_create(user=user)
         return Address.objects.filter(customer=customer)
 
-    def get_address(self, user, address_id):
+    def get_address(self, address_id):
         return get_object_or_404(Address, pk=address_id)
 
     def save_address(self, address):
@@ -103,6 +112,23 @@ class DjangoOrderRepository(IOrderRepository):
 
     def save_order(self, order):
         order.save()
+
+    def create_order(self, customer, address_id):
+        order = Order.objects.create(
+            customer=customer,
+            address=get_object_or_404(Address, id=address_id),
+            payment_status='C'
+        )
+        order.save()
+        return order
+
+    def add_item(self, order, item):
+        order_item = OrderItem.objects.create(order=order,
+                                              product=item.product,
+                                              quantity=item.quantity,
+                                              product_name=item.product.title,
+                                              price_on_order=item.product.price)
+        order_item.save()
 
 
 

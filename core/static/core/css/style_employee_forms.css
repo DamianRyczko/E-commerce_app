@@ -1,15 +1,13 @@
-
 :root {
-    --primary-color: #ff9f43;   /* Cat Orange */
-    --secondary-color: #576574; /* Dark Grey */
-    --navbar-color: #465a63;
-    --background-color: #ededd1;
-    --main-boc-color: #cad9e0;
-    --nav-button-color: #ffffff;
-    --button-color:#ff9f43;
-    --hover-button-color:#d68336;
-    --product-hover-color:#575974
-
+    --primary-emp-color: #1c1d1f;
+    --secondary-emp-color: #26292d;
+    --background-emp-color: #efefef;
+    --button-emp-color: #515151cc;
+    --hover-emp-button-color: #515151e0;
+    --product-emp-hover-color: #f3f3f3;
+    --products-emp-back-color: #f3f3f3;
+    --dark-text: #000000;
+    --white-text: #ffffff;
 }
 
 * {
@@ -18,108 +16,206 @@
     box-sizing: border-box;
 }
 
-/* 3. Body Styling */
 body {
-    font-family: 'Lato', sans-serif;
-    background-color: var(--background-color);
-    min-height: 600px;
+    font-family: 'Alegreya Sans SC', sans-serif;
+    background-color: var(--button-emp-color);
+    min-height: 100vh;
 }
 
-.main_container{
-    background-color: var(--navbar-color);
-    margin-left: auto;
-    margin-right: auto;
-    width: 30%;
-    min-height: 400px;
-    margin-top: 100px;
-    margin-bottom: 100px;
-    padding: 15px;
+/* Form container */
+.main_container {
+    background-color: var(--primary-emp-color);
+    margin: 100px auto;
+    width: 100%;
+    max-width: 700px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
-    border-radius: 20px;
+    border-radius: 23px;
     text-align: center;
-    color: #ffffff;
-}
-.main_container h1{
-    margin-bottom: 10px;
-    text-align: left;
-    padding: 10px;
-    border-bottom: 1px #ffffff solid;
+    color: var(--white-text);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-a{
-    margin-top: 50px;
-    color: #ffffff;
-}
-.form_box{
-    margin-top: 20px;
+.main_container h1 {
+    margin-bottom: 20px;
     text-align: left;
-    font-size: large;
-    margin-bottom: 10px;
-}
-.form_box input{
-    width: 100%;
-    margin-top: 5px;
-    height: 30px;
-    background-color: white;
-}
-.form_box input{
-    width: 100%;
-    margin-top: 5px;
-    height: 30px;
-    background-color: white;
-}
-.form_box textarea{
-    width: 100%;
-    margin-top: 5px;
-    height: 70px;
-    background-color: white;
-    resize: vertical;
-}
-.form_box select{
-    width: 100%;
-    margin-top: 5px;
-    height: 30px;
-    background-color: white;
-}
-.form_box_image{
-    margin-top: 20px;
-    text-align: left;
-    font-size: large;
-    margin-bottom: 10px;
-    width: 80%;
-}
-.form_box_image input {
-    font-size: 15px;
-    margin-top: 5px;
-}
-.form_box_image  {
-    font-size: 15px;
-    margin-top: 5px;
+    padding-bottom: 28px;
+    font-size: 28px;
+    font-weight: 700;
+    border-bottom: 2px #ffffff solid;
+    text-transform: uppercase;
 }
 
-.submit_button{
-    margin-top: 100px;
+/*form box*/
+.main_form_box {
     width: 100%;
-    display: flex;
+}
+.form_box {
+    margin-top: 20px;
+    text-align: left;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+.form_box label {
+    display: block;
+    color: var(--white-text);
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.form_box input,
+.form_box select,
+.form_box textarea {
+    width: 100%;
+    margin-top: 5px;
+    background-color: var(--white-text);
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Alegreya Sans SC', sans-serif;
+    font-size: 14px;
+}
+
+.form_box input {
     height: 40px;
-    justify-content: center;
 }
-.submit_button button {
-    width: 80%;
-    height: 100%;
-    background-color: #ff9f43;
-    text-align: center;
+
+.form_box textarea {
+    height: 100px;
+    resize: vertical;
+    font-size: 13px;
 }
-.submit_button button:hover {
+
+.form_box select {
+    height: 40px;
     cursor: pointer;
 }
-.error_box{
-    color: red;
+/*image form box*/
+.form_box_image {
+    margin-top: 20px;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.form_box_image label {
+    display: block;
+    color: var(--white-text);
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.form_box_image input {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.file-input-label {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    margin-top: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.file-input-label:hover {
+    background-color: #f5f5f5;
+}
+
+.file-input-label.has-file {
+    color: #333;
+}
+
+.submit_button {
+    margin-top: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.submit_button button {
+    width: 100%;
+    max-width: 250px;
+    height: 50px;
+    background-color: var(--button-emp-color);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'Alegreya Sans SC', sans-serif;
+    text-transform: uppercase;
+}
+
+.submit_button button:hover {
+    background-color: var(--hover-emp-button-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.error_box {
+    color: #c33;
     background: #ffeeee;
-    padding: 10px;
-    width: 50%;
-    margin: 20px auto 10px;
-    border-radius: 20px;
-    overflow: scroll;
+    padding: 15px;
+    width: 100%;
+    margin: 15px 0;
+    border-radius: 12px;
+    border: 1px solid #ff9999;
+    font-size: 13px;
+    line-height: 1.6;
+}
+/*links*/
+a {
+    margin-top: 20px;
+    color: var(--white-text);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+a:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .main_container {
+        width: 90%;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .main_container h1 {
+        font-size: 24px;
+    }
+
+    .submit_button button {
+        max-width: 100%;
+        height: 45px;
+        font-size: 14px;
+    }
+
+    .form_box input,
+    .form_box select,
+    .form_box textarea {
+        padding: 10px;
+        font-size: 13px;
+    }
 }

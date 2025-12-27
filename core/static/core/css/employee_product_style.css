@@ -85,7 +85,6 @@
     align-items: center;
     gap: 10px;
     margin-top: auto;
-    background-color: var(--button-emp-color);
     color: var(--button-emp-color);
 
 }
@@ -99,7 +98,6 @@
 }
 .button_box a {
     text-decoration: none;
-    background-color: var(--button-emp-color);
     color: var(--button-emp-color);
 
 }

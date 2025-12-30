@@ -2,13 +2,13 @@
 {% load static %}
 
 {% block css %}
+    <link rel="stylesheet" href="{%  static 'core/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/index_styles.css' %}">
 {% endblock %}
 
 {% block banner %}
     <div class = "banner">
         <div class = "banner_title_box">
-            <h1>🐾Koci sklep🐾</h1>
         </div>
     </div>
 {% endblock %}
@@ -18,9 +18,8 @@
         <div class ="left_section">
             <div class="filter_form_box">
                 <form method="get">
-
                     <div class="filter-box">
-                        <label for="{{ filter.form.title.id_for_label }}">Szukaj kota:</label><br>
+                        <label for="{{ filter.form.title.id_for_label }}">Szukaj produkt:</label><br>
                         {{ filter.form.title }}
                     </div>
 

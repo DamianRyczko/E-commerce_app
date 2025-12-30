@@ -20,7 +20,7 @@
 
 
     <nav>
-        <div class="nav_menu">
+        <a class="nav_menu">
             {% if request.resolver_match.url_name != 'orders' %}
                 <a href="{% url 'orders' %}">
                     <div class="nav_button">Historia zamówień</div>
@@ -28,15 +28,11 @@
             {% endif %}
 
             {% if request.resolver_match.url_name != 'home' %}
-                <a href="{% url 'home' %}">
-                    <div class="nav_button">Powrót do sklepu</div>
-                </a>
+                <a href="{% url 'home' %}" class="nav_button">Powrót do sklepu</a>
             {% endif %}
             {% if request.resolver_match.url_name != 'cart' %}
-            <a href="{% url 'cart' %}">
-                <div class="nav_button">
-                    Koszyk <div class="cart_icon_box">🛒 {{ cart_items_count }}</div>
-                </div>
+            <a href="{% url 'cart' %}" class="nav_button cart_button">
+                    Koszyk <span class="cart_count"> {{ cart_items_count }}</span>
             </a>
             {% endif %}
         </div>
@@ -65,7 +61,7 @@
     </div>
 
     <footer>
-        <h2>Ta strona to gówno i tutaj są jej wykonawcy : </h2><br>
+        <h2>Strona wykonana z miłości do kotów </h2><br>
         <ul>
             <li>Damian Ryczko</li>
             <li>Małgorzata Sokołwska </li>

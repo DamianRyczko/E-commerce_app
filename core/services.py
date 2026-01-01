@@ -1,5 +1,7 @@
 from typing import Any
 
+from django.db.models.sql.datastructures import Empty
+
 from .interfaces import ICartRepository, IProductRepository, ICartService, \
     IProductService, ICategoryService, ICategoryRepository, IAddressService, IAddressRepository, IOrderService, \
     IOrderRepository, ICustomerService, ICustomerRepository
@@ -122,6 +124,9 @@ class AddressService(IAddressService):
 class CartService(ICartService):
     def __init__(self, repo: ICartRepository):
         self.repo = repo
+
+    def is_cart_empty(self, user):
+        return self.repo.get_cart_items(user).count() == 0
 
     def get_cart_details(self, user):
         items = self.repo.get_cart_items(user)

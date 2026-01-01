@@ -41,9 +41,10 @@ class DjangoCartRepository(ICartRepository):
         CartItem.objects.filter(product=product).delete()
 
 
+
 class DjangoProductRepository(IProductRepository):
     def get_all(self):
-        return Product.objects.all()
+        return Product.objects.filter(is_active=True)
 
     def get_product(self, product_id):
         return get_object_or_404(Product, pk=product_id)
@@ -64,7 +65,7 @@ class DjangoProductRepository(IProductRepository):
 
 class DjangoCategoryRepository(ICategoryRepository):
     def get_all(self):
-        return Category.objects.all()
+        return Category.objects.filter(is_active=True)
 
     def get_category(self, category_id):
         return get_object_or_404(Category, pk=category_id)
@@ -79,7 +80,7 @@ class DjangoCategoryRepository(ICategoryRepository):
 class DjangoAddressRepository(IAddressRepository):
     def get_user_addresses(self, user):
         customer, _ = Customer.objects.get_or_create(user=user)
-        return Address.objects.filter(customer=customer)
+        return Address.objects.filter(customer=customer, is_active=True)
 
     def get_address(self, address_id):
         return get_object_or_404(Address, pk=address_id)

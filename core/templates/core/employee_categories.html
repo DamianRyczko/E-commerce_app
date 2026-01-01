@@ -38,5 +38,18 @@
             </div>
         </a>
         </div>
+        {% if messages%}
+            <div class="error_box">
+                {% for message in messages %}
+                    {% if "category" in message.message %}
+                        <p>Please correct the errors below:</p>
+                        {{ message }}
+                    {% endif %}
+                    {% if "deleted" in message.message %}
+                        {{ message }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

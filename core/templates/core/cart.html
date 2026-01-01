@@ -36,7 +36,7 @@
                 </div>
             </div>
             {% empty %}
-                <p>No cats available right now :(</p>
+                <p>No items in cart :(</p>
             {% endfor %}
         </div>
         <div class ="cart_user_section"></div>
@@ -47,9 +47,15 @@
             <h2>Wartość produktów w koszyku: {{ cart_value }}zł</h2>
         </div>
         <div class ="checkout_button_box">
-            <a href="{% url 'checkout' %}">
-                <div class="checkout_button">Dostawa i płatność</div>
-            </a>
+            {% if items_count > 0 %}
+                <a href="{% url 'checkout' %}" class="checkout_button ">
+                    Dostawa i płatność
+                </a>
+            {% else %}
+                <span  class="checkout_button"  style="background-color:gray;">
+                    Dostawa i płatność
+                </span>
+            {% endif %}
         </div>
     </div>
     </div>

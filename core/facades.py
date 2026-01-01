@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from .interfaces import ICartService, IOrderService, ICustomerService, IProductService, IAddressService, \
     ICategoryService, ICustomerFacade, IEmployeeFacade
 
@@ -27,15 +29,18 @@ class CustomerFacade(ICustomerFacade):
         return self.order_service.get_user_orders(user)
 
     def checkout(self, user, address):
-        customer = self.customer_service.get_customer(user)
-        order = self.order_service.create_order(customer, address)
+        if self.cart_service.is_cart_empty(user):
+            raise ValueError("Cannot proceed to checkout with an empty cart.")
 
-        cart_items = self.cart_service.get_cart_items(user)
-        for item in cart_items:
-            self.order_service.add_to_order(order, item)
-            self.cart_service.remove_product(user, item.product.id)
-            product = self.product_service.get_product(item.product.id)
-            self.product_service.update_product_inventory(product, item.quantity)
+        with transaction.atomic():
+            cart_items = self.cart_service.get_cart_items(user)
+            customer = self.customer_service.get_customer(user)
+            order = self.order_service.create_order(customer, address)
+            for item in cart_items:
+                self.order_service.add_to_order(order, item)
+                self.cart_service.remove_product(user, item.product.id)
+                product = self.product_service.get_product(item.product.id)
+                self.product_service.update_product_inventory(product, item.quantity)
 
 
     # =====================CUSTOMER=====================
@@ -52,26 +57,31 @@ class CustomerFacade(ICustomerFacade):
         return self.address_service.get_address(address_id)
 
     def save_address(self, user, address):
-        address.customer = self.customer_service.get_customer(user)
-        self.address_service.save_address(address)
+        with transaction.atomic():
+            address.customer = self.customer_service.get_customer(user)
+            self.address_service.save_address(address)
 
     def delete_address(self, address):
-        is_linked = self.order_service.is_address_linked_to_order(address)
-        self.address_service.delete_address(address, is_linked)
+        with transaction.atomic():
+            is_linked = self.order_service.is_address_linked_to_order(address)
+            self.address_service.delete_address(address, is_linked)
 
     # =====================CART=====================
     def get_cart_details(self, user):
         return self.cart_service.get_cart_details(user)
 
     def add_product(self, user, product_id, quantity):
-        self.cart_service.add_product(user, product_id, quantity)
+        with transaction.atomic():
+            self.cart_service.add_product(user, product_id, quantity)
 
     def update_quantity(self, user, product_id, quantity):
-        product = self.product_service.get_product(product_id)
-        self.cart_service.update_quantity(user, product, quantity)
+        with transaction.atomic():
+            product = self.product_service.get_product(product_id)
+            self.cart_service.update_quantity(user, product, quantity)
 
     def remove_product(self, user, product_id):
-        self.cart_service.remove_product(user, product_id)
+        with transaction.atomic():
+            self.cart_service.remove_product(user, product_id)
 
 class EmployeeFacade(IEmployeeFacade):
     def __init__(self,
@@ -96,13 +106,15 @@ class EmployeeFacade(IEmployeeFacade):
         return self.product_service.get_product(product_id)
 
     def save_product(self, product_id):
-         self.product_service.save_product(product_id)
+        with transaction.atomic():
+             self.product_service.save_product(product_id)
 
     def delete_product(self, product_id):
-         product = self.product_service.get_product(product_id)
-         is_linked = self.order_service.is_product_linked_to_order(product)
-         self.cart_service.remove_product_from_all_carts(product)
-         self.product_service.delete_product(product, is_linked)
+        with transaction.atomic():
+             product = self.product_service.get_product(product_id)
+             is_linked = self.order_service.is_product_linked_to_order(product)
+             self.cart_service.remove_product_from_all_carts(product)
+             self.product_service.delete_product(product, is_linked)
 
     # =====================ORDERS=====================
 
@@ -110,10 +122,12 @@ class EmployeeFacade(IEmployeeFacade):
         return self.order_service.get_all()
 
     def send_order(self, order_id):
-        self.order_service.send_order(order_id)
+        with transaction.atomic():
+            self.order_service.send_order(order_id)
 
     def complete_order(self, order_id):
-        self.order_service.complete_order(order_id)
+        with transaction.atomic():
+            self.order_service.complete_order(order_id)
 
     # =====================CATEGORY=====================
 
@@ -124,13 +138,15 @@ class EmployeeFacade(IEmployeeFacade):
         return self.category_service.get_category(category_id)
 
     def save_category(self, category):
-        self.category_service.save_category(category)
+        with transaction.atomic():
+            self.category_service.save_category(category)
 
     def delete_category(self, category_id):
-        category = self.category_service.get_category(category_id)
-        is_active_linked = self.product_service.is_category_linked_to_active_product(category)
-        is_linked = self.product_service.is_category_linked_to_any_product(category)
-        self.category_service.delete_category(category, is_active_linked, is_linked)
+        with transaction.atomic():
+            category = self.category_service.get_category(category_id)
+            is_active_linked = self.product_service.is_category_linked_to_active_product(category)
+            is_linked = self.product_service.is_category_linked_to_any_product(category)
+            self.category_service.delete_category(category, is_active_linked, is_linked)
 
 
 

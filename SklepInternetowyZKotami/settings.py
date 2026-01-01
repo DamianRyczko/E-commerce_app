@@ -80,9 +80,9 @@ WSGI_APPLICATION = 'SklepInternetowyZKotami.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
+        'NAME': 'sklep_koty_db',
         'USER': 'root',
-        'PASSWORD': 'a7IzxSk0MS6MKQr',
+        'PASSWORD': 'Damian123456789',
         'HOST': 'localhost',
     }
 }

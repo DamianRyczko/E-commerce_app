@@ -145,18 +145,7 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 8px 15px rgba(0,0,0,0.2);
 }
-/* ERROR BOX */
-.error_box {
-    color: #c33;
-    background: #ffeeee;
-    padding: 15px;
-    width: 100%;
-    margin: 15px 0;
-    border-radius: 12px;
-    border: 1px solid #ff9999;
-    font-size: 13px;
-    line-height: 1.6;
-}
+
 /* LINKS */
 a {
     margin-top: 20px;

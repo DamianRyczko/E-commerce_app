@@ -14,8 +14,10 @@ def register(request):
 
             user_data = {
                 'username': user_form.cleaned_data.get('username'),
+                'first_name': user_form.cleaned_data.get('first_name'),
+                'last_name': user_form.cleaned_data.get('last_name'),
                 'email': user_form.cleaned_data.get('email'),
-                'password': user_form.cleaned_data.get('password'),
+                'password': user_form.cleaned_data.get('password1'),
 
             }
 
@@ -54,8 +56,10 @@ def login(request):
 
             auth_facade_instance.login(request, user)
 
+            redirect_path = auth_facade_instance.get_redirect_url(user)
+
             messages.success(request, f"Login successful for {user.username}!")
-            return redirect("home")
+            return redirect(redirect_path)
         else:
             messages.error(request, "Invalid username or password.")
     else:

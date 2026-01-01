@@ -9,7 +9,16 @@ class AuthService(IAuthService):
         with transaction.atomic():
             user = self.repo.create_user(user_data)
             self.repo.create_customer(user, customer_data)
+            self.repo.add_user_to_group(user, 'Customers')
             return user
+
+    def get_post_login_redirect_url(self, user):
+        if self.repo.user_has_group(user, 'Admins'):
+            return "admin:index"
+        elif self.repo.user_has_group(user, 'Employees'):
+            return "employee_products"
+        else:
+            return "home"
 
     def login_user(self, request, user):
         # Adapter do mechanizmu sesji Django

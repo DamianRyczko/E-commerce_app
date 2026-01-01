@@ -35,11 +35,10 @@
                 </form>
             </div>
          </div>
-    {% if user_form.errors or customer_form.errors %}
+    {% if form.errors %}
         <div class="error_box">
             <p>Please correct the errors below:</p>
-            {{ user_form.errors }}
-            {{ customer_form.errors }}
+            {{ form.errors }}
         </div>
     {% endif %}
 {% endblock %}

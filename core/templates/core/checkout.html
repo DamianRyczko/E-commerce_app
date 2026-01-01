@@ -44,7 +44,6 @@
                 <div class="address_form_box">
                 <h2>Adres dostawy:</h2>
 
-    {# --- WARIANT A: Adres jest już wybrany --- #}
     {% if selected_address %}
         <div class="selected_address_box" style="border: 2px solid green; padding: 15px;">
             <h3>Wybrany adres:</h3>
@@ -77,9 +76,6 @@
                             {{ address.zip_code }}
                         </label>
 
-                        <!-- Delete Button -->
-                        <!-- FIX: Removed nested <form>. Used formaction to handle deletion via the main outer form. -->
-                        <!-- formnovalidate ensures we can delete even if the main form has required fields not filled -->
                         <button type="submit"
                                 formaction="{% url 'delete_address' address.id %}"
                                 formnovalidate
@@ -156,6 +152,29 @@
             </div>
         </div>
 
+    {% if card_form.errors or blik_form.errors or messages%}
+    <div class="error_box">
+        <p>Please correct the errors below:</p>
+
+        {% if messages %}
+        {% for message in messages %}
+            {% if "Address" in message.message %}
+                {{ message }}
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        {# Display Card Errors #}
+        {% if card_form.errors %}
+                {{ card_form.errors }}
+        {% endif %}
+
+        {# Display Blik Errors #}
+        {% if blik_form.errors %}
+                {{ blik_form.errors }}
+        {% endif %}
+    </div>
+    {% endif %}
 
     </div>
 {% endblock %}

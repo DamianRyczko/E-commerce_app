@@ -20,7 +20,7 @@
 
 
     <nav>
-        <a class="nav_menu">
+        <div class="nav_menu">
             {% if request.resolver_match.url_name != 'orders' %}
                 <a href="{% url 'orders' %}">
                     <div class="nav_button">Historia zamówień</div>

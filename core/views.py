@@ -1,14 +1,36 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, Cart, CartItem, Customer, Category, Address, OrderItem, Order
-from .filters import ProductFilter  # Importujemy nasz filtr
+from .filters import ProductFilter
 from .forms import CategoryForm, ProductForm, AddressForm, CardForm, BlikForm
 from django.contrib import messages
 from django.urls import reverse
+from .decorators import allowed_roles
 
 from .factory import customer_facade, employee_facade
 
-@login_required(login_url='login')
+
+
+#---------------------------- HOME ---------------------------
+def home(request):
+    products_queryset = customer_facade.get_products_for_display()
+
+    product_filter = ProductFilter(request.GET, queryset=products_queryset)
+
+
+    data = customer_facade.get_cart_details(request.user)
+
+
+    context = {
+        'filter': product_filter,
+        'products': product_filter.qs,
+        'cart_items_count': data['count'],
+    }
+
+    return render(request, 'core/index.html', context)
+
+#---------------------------- CUSTOMER ---------------------------
+@allowed_roles(allowed_groups=['Customers'])
 def checkout(request):
     details = customer_facade.get_cart_details(request.user)
     cart_items = details['items']
@@ -16,6 +38,8 @@ def checkout(request):
     selected_address = None
     customer = customer_facade.get_customer(request.user)
 
+    card_form = CardForm()
+    blik_form = BlikForm()
     if request.method == 'POST':
 
         if 'clear_address' in request.POST:
@@ -34,8 +58,6 @@ def checkout(request):
                 if card_form.is_valid():
                     customer_facade.checkout(request.user, request.session['selected_shipping_address'])
                     return redirect("orders")
-                else:
-                    messages.error(request, "Invalid card")
             else:
                 messages.error(request, "Select Address")
 
@@ -45,8 +67,6 @@ def checkout(request):
                 if blik_form.is_valid():
                     customer_facade.checkout(request.user, request.session['selected_shipping_address'])
                     return redirect("orders")
-                else:
-                    messages.error(request, "Invalid blik code")
             else:
                 messages.error(request, "Select Address")
 
@@ -57,11 +77,6 @@ def checkout(request):
     if session_addr_id:
         selected_address = customer_facade.get_address(session_addr_id)
 
-
-
-    card_form = CardForm()
-    blik_form = BlikForm()
-
     context = {
         'customer': customer,
         'cart_items': cart_items,
@@ -71,33 +86,12 @@ def checkout(request):
         'blik_form': blik_form,
     }
     return render(request, 'core/checkout.html', context)
-
-#---------------------------- HOME ---------------------------
-def home(request):
-    products_queryset = customer_facade.get_products_for_display()
-    # Nakładamy filtr.
-    # request.GET zawiera parametry z URL (np. ?ordering=price)
-    product_filter = ProductFilter(request.GET, queryset=products_queryset)
-
-
-    data = customer_facade.get_cart_details(request.user)
-
-    # Ważne: do szablonu przekazujemy przefiltrowaną listę (product_filter.qs)
-    context = {
-        'filter': product_filter,  # Przekazujemy obiekt filtra (by wyświetlić formularz)
-        'products': product_filter.qs,  # Przekazujemy posortowane/przefiltrowane produkty
-        'cart_items_count': data['count'],
-    }
-
-    return render(request, 'core/index.html', context)
-
-#---------------------------- CUSTOMER ---------------------------
-@login_required(login_url='login')
+@allowed_roles(allowed_groups=['Customers'])
 def orders(request):
     order_list = customer_facade.get_user_orders(request.user)
     return render(request, 'core/orders.html', {'order_list': order_list})
 
-@login_required(login_url='login')
+@allowed_roles(allowed_groups=['Customers'])
 def add_address(request):
     if request.method == 'POST':
         form = AddressForm(request.POST)
@@ -111,7 +105,7 @@ def add_address(request):
     return render(request, 'core/address.html', {'form': form})
 
 
-@login_required(login_url='login')
+@allowed_roles(allowed_groups=['Customers'])
 def delete_address(request, address_id):
     if request.method == 'POST':
 
@@ -121,17 +115,18 @@ def delete_address(request, address_id):
             customer_facade.delete_address(address)
     return redirect('checkout')
 #---------------------------- CART ---------------------------
-@login_required(login_url='login')
+@allowed_roles(allowed_groups=['Customers'])
 def cart(request):
     data = customer_facade.get_cart_details(request.user)
 
     context = {
         'cart_items': data['items'],
         'cart_value': data['total_value'],
+        'items_count': data['count'],
     }
     return render(request, 'core/cart.html', context)
 
-@login_required(login_url='login')
+@allowed_roles(allowed_groups=['Customers'])
 def add_to_cart(request, product_id):
     if request.method == 'POST':
         try:
@@ -148,7 +143,7 @@ def add_to_cart(request, product_id):
 
 
 
-@login_required(login_url='login')
+@allowed_roles(allowed_groups=['Customers'])
 def update_quantity(request, product_id):
     if request.method == 'POST':
         try:
@@ -159,7 +154,7 @@ def update_quantity(request, product_id):
 
     return redirect('cart')
 
-@login_required(login_url='login')
+@allowed_roles(allowed_groups=['Customers'])
 def delete_from_cart(request, product_id):
     if request.method == 'POST':
         customer_facade.remove_product(request.user, product_id)
@@ -167,28 +162,31 @@ def delete_from_cart(request, product_id):
     return redirect('cart')
 
 #---------------------------- EMPLOYEE ---------------------------
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def employee_products(request):
     products = employee_facade.get_all_products()
     return render(request, 'core/employee_products.html', {'products': products})
 
-
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def employee_orders(request):
     orders = employee_facade.get_all_orders()
     return render(request, 'core/employee_orders.html', {'orders': orders})
 
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def orders_sent(request, pk):
     employee_facade.send_order(pk)
     return redirect('employee_orders')
 
-
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def orders_completed(request, pk):
     employee_facade.complete_order(pk)
     return redirect('employee_orders')
 
-
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def employee_categories(request):
     categories = employee_facade.get_categories()
     return render(request, 'core/employee_categories.html', {'categories': categories})
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def manage_category(request, pk=None):
     category = employee_facade.get_category(pk)
 
@@ -208,11 +206,17 @@ def manage_category(request, pk=None):
 
     return render(request, 'core/category_add.html', {'form': form})
 
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def delete_category(request, pk):
     if request.method == 'POST':
-        employee_facade.delete_category(pk)
+        try:
+            employee_facade.delete_category(pk)
+            messages.success(request, 'Category deleted')
+        except ValueError as e:
+            messages.error(request, str(e))
     return redirect('employee_categories')
 
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def manage_product(request, pk = None):
     product = employee_facade.get_product(pk)
     if request.method == 'POST':
@@ -227,6 +231,7 @@ def manage_product(request, pk = None):
         form = ProductForm(instance=product)
     return render(request, 'core/products_add.html', {'form': form})
 
+@allowed_roles(allowed_groups=['Employees', 'Admins'])
 def delete_product(request, pk):
     if request.method == 'POST':
         employee_facade.delete_product(pk)

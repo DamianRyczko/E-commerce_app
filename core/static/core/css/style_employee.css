@@ -166,3 +166,15 @@ footer li {
 button:active {
     border: inset 2px;
 }
+/* ERROR BOX */
+.error_box {
+    color: whitesmoke;
+    background: #515151e0;
+    padding: 15px;
+    width: 100%;
+    margin: 15px 0;
+    border-radius: 12px;
+    border: 3px solid #000000;
+    font-size: 13px;
+    line-height: 1.6;
+}

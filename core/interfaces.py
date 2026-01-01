@@ -19,6 +19,7 @@ class ICartRepository(ABC):
     def remove_product_from_all_carts(self, product): pass
 
 
+
 class IProductRepository(ABC):
     @abstractmethod
     def get_all(self) -> Any: pass
@@ -124,6 +125,8 @@ class ICartService(ABC):
     @abstractmethod
     def get_cart_items(self, user) -> List[Any]: pass
 
+    @abstractmethod
+    def is_cart_empty(self, user) -> bool: pass
 
 class IProductService(ABC):
     @abstractmethod

@@ -12,3 +12,6 @@ class AuthFacade(IAuthFacade):
 
     def logout(self, request):
         self.service.logout_user(request)
+
+    def get_redirect_url(self, user):
+        return self.service.get_post_login_redirect_url(user)

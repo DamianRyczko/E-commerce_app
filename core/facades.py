@@ -105,9 +105,9 @@ class EmployeeFacade(IEmployeeFacade):
     def get_product(self, product_id):
         return self.product_service.get_product(product_id)
 
-    def save_product(self, product_id):
+    def save_product(self, product):
         with transaction.atomic():
-             self.product_service.save_product(product_id)
+             self.product_service.save_product(product)
 
     def delete_product(self, product_id):
         with transaction.atomic():

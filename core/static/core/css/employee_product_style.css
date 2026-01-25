@@ -109,7 +109,7 @@
 .function_button{
     padding: 8px 16px;
     background-color: var(--button-emp-color);
-    color: var(--button-emp-color);
+    color: var(--white-text);
     width: auto;
     text-align: center;
     border-radius: 15px;

@@ -4,14 +4,14 @@ from django import forms
 from .models import Product
 
 class ProductFilter(django_filters.FilterSet):
-    # 1. To jest kluczowe - musimy zdefiniować pole 'title'
+
     title = django_filters.CharFilter(
         field_name='title',      # Nazwa pola w modelu
         lookup_expr='icontains', # icontains = ignoruj wielkość liter, szukaj fragmentu
         label='Szukaj kota'      # Etykieta
     )
 
-    # 2. Twoje sortowanie
+
     ordering = django_filters.OrderingFilter(
         fields=(
             ('price', 'price'),

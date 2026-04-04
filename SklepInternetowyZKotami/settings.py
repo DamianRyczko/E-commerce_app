@@ -77,7 +77,6 @@ WSGI_APPLICATION = 'SklepInternetowyZKotami.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -86,6 +85,9 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
         'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
         'PORT': os.environ.get('DB_PORT', '3306'),
+        'OPTIONS': {
+            'ssl': {'ca': False},
+        } if os.environ.get('DB_HOST', '127.0.0.1') != '127.0.0.1' else {},
     }
 }
 

@@ -5,15 +5,12 @@ on:
     branches: [master]
 
 env:
-  ACR_NAME: sklepinternetowy        # your Azure Container Registry name (lowercase, no spaces)
-  RESOURCE_GROUP: sklepRG           # your Azure resource group name
-  CONTAINER_NAME: sklep-app         # name for the container instance
-  IMAGE_NAME: sklep                 # docker image name
+  ACR_NAME: sklepinternetowy
+  RESOURCE_GROUP: sklepRG
+  CONTAINER_NAME: sklep-app
+  IMAGE_NAME: sklep
 
 jobs:
-  # -------------------------------------------------------
-  # JOB 1: Run all tests
-  # -------------------------------------------------------
   test:
     runs-on: ubuntu-latest
 
@@ -47,6 +44,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Wait for MySQL to be ready
+        run: |
+          for i in {1..30}; do
+            if mysqladmin ping -h 127.0.0.1 -u root -prootpassword --silent; then
+              echo "MySQL is ready"
+              break
+            fi
+            echo "Waiting for MySQL... attempt $i"
+            sleep 2
+          done
+
       - name: Grant test database permissions
         run: |
           mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON test_sklep.* TO 'django'@'%'; FLUSH PRIVILEGES;"
@@ -65,9 +73,6 @@ jobs:
       - name: Run tests
         run: python manage.py test
 
-  # -------------------------------------------------------
-  # JOB 2: Build & deploy to Azure (only if tests pass)
-  # -------------------------------------------------------
   deploy:
     needs: test
     runs-on: ubuntu-latest

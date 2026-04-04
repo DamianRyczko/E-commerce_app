@@ -1,0 +1,14 @@
+# Environment files - never commit these
+.env.local
+.env
+.env.*
+
+# Django
+*.pyc
+__pycache__/
+staticfiles/
+media/
+db.sqlite3
+
+# Docker
+.dockerignore

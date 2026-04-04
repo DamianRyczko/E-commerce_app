@@ -112,6 +112,7 @@ jobs:
             --registry-login-server ${{ env.ACR_NAME }}.azurecr.io \
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --os-type Linux \
             --ports 8000 \
             --dns-name-label ${{ env.CONTAINER_NAME }} \
             --environment-variables \

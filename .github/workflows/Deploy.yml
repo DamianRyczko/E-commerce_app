@@ -1,0 +1,116 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [master]
+
+env:
+  ACR_NAME: sklepinternetowy        # your Azure Container Registry name (lowercase, no spaces)
+  RESOURCE_GROUP: sklepRG           # your Azure resource group name
+  CONTAINER_NAME: sklep-app         # name for the container instance
+  IMAGE_NAME: sklep                 # docker image name
+
+jobs:
+  # -------------------------------------------------------
+  # JOB 1: Run all tests
+  # -------------------------------------------------------
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: sklep
+          MYSQL_USER: django
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DEBUG: True
+      SECRET_KEY: ci-test-secret-key
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: sklep
+      DB_USER: django
+      DB_PASSWORD: password
+      ALLOWED_HOSTS: localhost
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run migrations
+        run: python manage.py migrate
+
+      - name: Run tests
+        run: python manage.py test
+
+  # -------------------------------------------------------
+  # JOB 2: Build & deploy to Azure (only if tests pass)
+  # -------------------------------------------------------
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Build and push image to Azure Container Registry
+        run: |
+          az acr build \
+            --registry ${{ env.ACR_NAME }} \
+            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --image ${{ env.IMAGE_NAME }}:latest \
+            .
+
+      - name: Delete existing container (if exists)
+        run: |
+          az container delete \
+            --name ${{ env.CONTAINER_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --yes \
+          || true
+
+      - name: Deploy new container
+        run: |
+          az container create \
+            --name ${{ env.CONTAINER_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
+            --registry-login-server ${{ env.ACR_NAME }}.azurecr.io \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --ports 8000 \
+            --dns-name-label ${{ env.CONTAINER_NAME }} \
+            --environment-variables \
+              DEBUG=False \
+              DB_HOST=${{ secrets.DB_HOST }} \
+              DB_NAME=${{ secrets.DB_NAME }} \
+              DB_USER=${{ secrets.DB_USER }} \
+              ALLOWED_HOSTS=${{ env.CONTAINER_NAME }}.polandcentral.azurecontainer.io \
+            --secure-environment-variables \
+              SECRET_KEY=${{ secrets.SECRET_KEY }} \
+              DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            --location polandcentral

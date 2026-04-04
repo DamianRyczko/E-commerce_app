@@ -47,6 +47,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Grant test database permissions
+        run: |
+          mysql -h 127.0.0.1 -u root -prootpassword -e "GRANT ALL PRIVILEGES ON test_sklep.* TO 'django'@'%'; FLUSH PRIVILEGES;"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

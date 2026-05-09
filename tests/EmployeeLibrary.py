@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management import call_command
 
 # ===================== 0. FIX PATHS =====================
-# Ensure Python can find the 'SklepInternetowyZKotami' module
+# Ensure Python can find the 'E-commarce_app' module
 current_file_path = Path(__file__).resolve()
 project_root = current_file_path.parent.parent
 sys.path.append(str(project_root))
